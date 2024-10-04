@@ -7,10 +7,22 @@
 
 ## Design Decisions
 
-- Programming Language: this is a simple program which will evaluate programming and problem solving skill instead of applying technology or system design, so the programming language does not matter. Between Go and Java, Go is more famous for system program and CLI application. Also, Go has better performance and more efficient memory management than Java. Finally, it's a personal program and I have better resource using Go (more experience with it).
-- Libraries and Frameworks: I belive standard libraries can cover most of the logic.
-- Testing: standard `testing` package is good enough.
-- Quality Attributes: I would choose 2 to 3 from Usability (this is the program for personal usage), Performance (in case I need to process large data), Testability (ensure the quality of the output), and Modifiability (so I could extend the program to help me in more tasks).
+### Programming Language
+
+This assignment request a simple program which will evaluate programming and problem solving skill instead of applying technology or system design, so the programming language does not matter. Between Go and Java, Go is more famous for system program and CLI application. Also, Go has better performance and more efficient memory management than Java. Finally, it's a personal program and I have better resource using Go (more experience with it).
+
+### Libraries and Frameworks
+
+In the first version of the program, I go with standard libraries:
+
+- `os`, `flag` for commandline interface.
+- `encoding/csv`, `encoding/json`, `path/filepath` for handling input and output files.
+- `sort`, `strconv`, `strings`, `time` for handling logic filtering, converting, comparing.
+- `testing` package would be use for unit test.
+
+### Quality Attributes
+
+I would choose 2 to 3 from Usability (this is the program for personal usage), Performance (in case I need to process large data), Testability (ensure the quality of the output), and Modifiability (so I could extend the program to help me in more tasks).
 
 ## Requirement Fullfilment
 
