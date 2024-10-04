@@ -10,9 +10,26 @@ import (
 	"transaction-history/pkg/transaction"
 )
 
+var (
+	cpuprofile = flag.String("cpuprofile", "", "write cpu profile to `file`")
+	memprofile = flag.String("memprofile", "", "write memory profile to `file`")
+)
+
 func main() {
 	// Set up logging to include the timestamp.
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
+	// // Go’s profiler
+	// f, err := os.Create("cpuprofile")
+	// if err != nil {
+	// 	fmt.Fprintf(os.Stderr, "could not create CPU profile: %v\n", err)
+	// 	os.Exit(1)
+	// }
+	// if err := pprof.StartCPUProfile(f); err != nil {
+	// 	fmt.Fprintf(os.Stderr, "could not start CPU profile: %v\n", err)
+	// 	os.Exit(1)
+	// }
+	// defer pprof.StopCPUProfile()
 
 	// Parse command-line arguments.
 	yearMonth, filePath := parseArguments()
