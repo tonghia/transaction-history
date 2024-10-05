@@ -7,7 +7,8 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"transaction-history/pkg/transaction"
+
+	"github.com/tonghia/transaction-history/pkg/transaction"
 )
 
 func main() {
