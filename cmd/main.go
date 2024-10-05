@@ -24,7 +24,10 @@ func main() {
 	}
 	defer file.Close()
 
-	summary := transaction.ProcessData(file, yearMonth)
+	summary, err := transaction.ProcessData(file, yearMonth)
+	if err != nil {
+		log.Fatalf("Error processing CSV file: %v", err)
+	}
 
 	// Generate JSON output.
 	outputJSON(summary)

@@ -2,8 +2,7 @@ package transaction
 
 import (
 	"fmt"
-	"log"
-	"os"
+	"io"
 	"sort"
 	"time"
 )
@@ -23,14 +22,14 @@ type Summary struct {
 	Transactions     []Transaction `json:"transactions"`
 }
 
-// filterTransactions filters transactions based on the specified year and month.
-func filterTransactions(transactions []Transaction, year int, month time.Month) []Transaction {
+// FilterTransactions filters transactions based on the specified year and month.
+func FilterTransactions(transactions []Transaction, year int, month time.Month) []Transaction {
 	var filtered []Transaction
 
 	for _, tx := range transactions {
 		txDate, err := time.Parse("2006/01/02", tx.Date)
 		if err != nil {
-			log.Fatalf("Error parsing transaction date '%s': %v", tx.Date, err)
+			continue
 		}
 
 		if txDate.Year() == year && txDate.Month() == month {
@@ -41,8 +40,8 @@ func filterTransactions(transactions []Transaction, year int, month time.Month) 
 	return filtered
 }
 
-// calculateTotals calculates the total income and total expenditure.
-func calculateTotals(transactions []Transaction) (int, int) {
+// CalculateTotals calculates the total income and total expenditure.
+func CalculateTotals(transactions []Transaction) (int, int) {
 	totalIncome := 0
 	totalExpenditure := 0
 
@@ -57,8 +56,8 @@ func calculateTotals(transactions []Transaction) (int, int) {
 	return totalIncome, totalExpenditure
 }
 
-// sortTransactions sorts transactions in descending order by date.
-func sortTransactions(transactions []Transaction) {
+// SortTransactions sorts transactions in descending order by date.
+func SortTransactions(transactions []Transaction) {
 	sort.Slice(transactions, func(i, j int) bool {
 		dateI, _ := time.Parse("2006/01/02", transactions[i].Date)
 		dateJ, _ := time.Parse("2006/01/02", transactions[j].Date)
@@ -66,26 +65,32 @@ func sortTransactions(transactions []Transaction) {
 	})
 }
 
-func ProcessData(file *os.File, yearMonth string) Summary {
+func ProcessData(file io.Reader, yearMonth string) (Summary, error) {
 	// Parse the test period
-	year, month := parseYearMonth(yearMonth)
+	year, month, err := ParseYearMonth(yearMonth)
+	if err != nil {
+		return Summary{}, nil
+	}
 
 	// Read and parse the CSV file.
-	transactions := readCSV(file)
+	transactions, err := CSVtoTransactions(file)
+	if err != nil {
+		return Summary{}, err
+	}
 
 	// Filter transactions based on the specified year and month.
-	filteredTransactions := filterTransactions(transactions, year, month)
+	filteredTransactions := FilterTransactions(transactions, year, month)
 
 	// Calculate total income and expenditure.
-	totalIncome, totalExpenditure := calculateTotals(filteredTransactions)
+	totalIncome, totalExpenditure := CalculateTotals(filteredTransactions)
 
 	// Sort transactions in descending order by date.
-	sortTransactions(filteredTransactions)
+	SortTransactions(filteredTransactions)
 
 	return Summary{
 		Period:           fmt.Sprintf("%04d/%02d", year, month),
 		TotalIncome:      totalIncome,
 		TotalExpenditure: totalExpenditure,
 		Transactions:     filteredTransactions,
-	}
+	}, nil
 }
