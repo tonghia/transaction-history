@@ -5,7 +5,8 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
-	"transaction-history/pkg/transaction"
+
+	"github.com/tonghia/transaction-history/pkg/transaction"
 )
 
 // TestSummaryGeneration tests the summary generation for a specified period.
