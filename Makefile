@@ -12,7 +12,7 @@ BUILD_DIR=build
 
 # Go settings
 GO=go
-PKG=.
+PKG=cmd/main.go
 
 # Versioning
 VERSION=$(shell git describe --tags --always --dirty)
@@ -29,7 +29,7 @@ all: build
 # Build the binary
 build:
 	@echo "🏗️  Building the application..."
-	$(GO) build -ldflags "$(LDFLAGS)" -o $(BUILD_DIR)/$(BINARY_NAME) $(LDFLAGS) $(PKG)
+	$(GO) build -ldflags "$(LDFLAGS)" -o $(BUILD_DIR)/$(BINARY_NAME) $(PKG)
 
 # Run the application with sample arguments
 # You can modify the PERIOD and FILE_PATH as needed
