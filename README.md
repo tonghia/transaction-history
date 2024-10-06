@@ -17,7 +17,15 @@
   - The second most value of this program is the program structure and module design.
   - The CLI interface, handling input and output should be completed quickly by using common libraries.
   - The build system, github set up should be completed quickly by using online resources.
-- I am thinking about having 2 versions, the first one forcus on making the program work with simple, short data. The second one will focus on handling with a really big file, large data.
+- I am thinking about having 2 versions, the first one focus on making the program work with simple, short data. The second one will focus on handling with a really big file, large data.
+- In the first version, I pipelined the process into steps in which the output of one step will be the input of the next step:
+  1. Convert the data in csv file into a list of the program data structure.
+  2. Filter the list by the period argument.
+  3. Calculate total expense and income, and sort the filtered list.
+- The first version is easy to test and understand but it also waste lots of memory by transfer data between each step, the default sort function is not efficient too. It cannot work with a large dataset.
+- In the second version, I intend to improve 2 things:
+  - While reading the data, filter by period argument. When building the filtered list, apply insertion sort.
+  - Divide the original file into chunks and process each chunk in parallel. Finally, calculate the total and apply merge sort for each chunk transaction list.
 
 ## Design Decisions
 
@@ -36,7 +44,15 @@ In the first version of the program, I go with standard libraries:
 
 ### Quality Attributes
 
-I would choose 2 to 3 from Usability (this is the program for personal usage), Performance (in case I need to process large data), Testability (ensure the quality of the output), and Modifiability (so I could extend the program to help me in more tasks).
+There are some attributes which can be suitable for this program:
+
+- Performance: by complete the task fast and can handle a large dataset.
+- Testability: ability to easily write test with high coverage.
+- Modifiability: ability to change the format of input, ouput of the program.
+- Usability: by providing command, flags, or argument to support multiple features.
+
+In the first version, I would choose: Modifiability, Testability.
+In the second version, I would choose: Performance and Modifiability.
 
 ## Requirement Fullfilment
 
