@@ -1,8 +1,6 @@
 package transaction
 
 import (
-	"fmt"
-	"io"
 	"sort"
 	"time"
 )
@@ -63,34 +61,4 @@ func SortTransactions(transactions []Transaction) {
 		dateJ, _ := time.Parse("2006/01/02", transactions[j].Date)
 		return dateI.After(dateJ)
 	})
-}
-
-func ProcessData(file io.Reader, yearMonth string) (Summary, error) {
-	// Parse the test period
-	year, month, err := ParseYearMonth(yearMonth)
-	if err != nil {
-		return Summary{}, nil
-	}
-
-	// Read and parse the CSV file.
-	transactions, err := CSVtoTransactions(file)
-	if err != nil {
-		return Summary{}, err
-	}
-
-	// Filter transactions based on the specified year and month.
-	filteredTransactions := FilterTransactions(transactions, year, month)
-
-	// Calculate total income and expenditure.
-	totalIncome, totalExpenditure := CalculateTotals(filteredTransactions)
-
-	// Sort transactions in descending order by date.
-	SortTransactions(filteredTransactions)
-
-	return Summary{
-		Period:           fmt.Sprintf("%04d/%02d", year, month),
-		TotalIncome:      totalIncome,
-		TotalExpenditure: totalExpenditure,
-		Transactions:     filteredTransactions,
-	}, nil
 }

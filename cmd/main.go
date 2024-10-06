@@ -10,7 +10,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/tonghia/transaction-history/pkg/transaction"
+	"github.com/tonghia/transaction-history/internal/processor"
+	"github.com/tonghia/transaction-history/internal/transaction"
 )
 
 func main() {
@@ -38,7 +39,7 @@ func main() {
 	}
 	defer file.Close()
 
-	summary, err := transaction.ProcessData(file, yearMonth)
+	summary, err := processor.ProcessData(file, yearMonth)
 	if err != nil {
 		log.Fatalf("Error processing CSV file: %v", err)
 	}

@@ -6,7 +6,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/tonghia/transaction-history/pkg/transaction"
+	"github.com/tonghia/transaction-history/internal/processor"
+	"github.com/tonghia/transaction-history/internal/transaction"
 )
 
 // TestSummaryGeneration tests the summary generation for a specified period.
@@ -36,7 +37,7 @@ func TestSummaryGeneration(t *testing.T) {
 		t.Fatalf("Failed to unmarshal expected summary JSON: %v", err)
 	}
 
-	generatedSummary, err := transaction.ProcessData(transactionsFile, testPeriod)
+	generatedSummary, err := processor.ProcessData(transactionsFile, testPeriod)
 	if err != nil {
 		t.Fatalf("Failed to generate summary: %v", err)
 	}
