@@ -12,7 +12,7 @@ BUILD_DIR=build
 
 # Go settings
 GO=go
-PKG=cmd/main.go
+MAIN=cmd/main.go
 
 # Versioning
 VERSION=$(shell git describe --tags --always --dirty)
@@ -29,13 +29,13 @@ all: build
 # Build the binary
 build:
 	@echo "🏗️  Building the application..."
-	$(GO) build -ldflags "$(LDFLAGS)" -o $(BUILD_DIR)/$(BINARY_NAME) $(PKG)
+	$(GO) build -ldflags "$(LDFLAGS)" -o $(BUILD_DIR)/$(BINARY_NAME) $(MAIN)
 
 # Run the application with sample arguments
 # You can modify the PERIOD and FILE_PATH as needed
 run: build
 	@echo "🚀 Running the application..."
-	./$(BUILD_DIR)/$(BINARY_NAME) -period=202201 -file=transactions.csv
+	./$(BUILD_DIR)/$(BINARY_NAME) -interactive
 
 # Clean build artifacts
 clean:
@@ -62,15 +62,11 @@ lint:
 # Builds binaries for Linux, Windows, and macOS
 cross-compile:
 	@echo "🌐 Cross-compiling for different platforms..."
-	$(GO) build -o $(BUILD_DIR)/$(BINARY_NAME)-linux-amd64 -ldflags="$(LDFLAGS)" GOOS=linux GOARCH=amd64 $(PKG)
-	$(GO) build -o $(BUILD_DIR)/$(BINARY_NAME)-windows-amd64.exe -ldflags="$(LDFLAGS)" GOOS=windows GOARCH=amd64 $(PKG)
-	$(GO) build -o $(BUILD_DIR)/$(BINARY_NAME)-darwin-amd64 -ldflags="$(LDFLAGS)" GOOS=darwin GOARCH=amd64 $(PKG)
+	$(GO) build -o $(BUILD_DIR)/$(BINARY_NAME)-linux-amd64 -ldflags="$(LDFLAGS)" GOOS=linux GOARCH=amd64 $(MAIN)
+	$(GO) build -o $(BUILD_DIR)/$(BINARY_NAME)-windows-amd64.exe -ldflags="$(LDFLAGS)" GOOS=windows GOARCH=amd64 $(MAIN)
+	$(GO) build -o $(BUILD_DIR)/$(BINARY_NAME)-darwin-amd64 -ldflags="$(LDFLAGS)" GOOS=darwin GOARCH=amd64 $(MAIN)
 	@echo "✅ Cross-compilation completed."
 
-# Install the binary to GOPATH/bin
-install:
-	@echo "📦 Installing the binary..."
-	$(GO) install $(PKG)
 
 # ============================
 #         PHONY
