@@ -2,9 +2,11 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -14,6 +16,10 @@ import (
 	"github.com/tonghia/transaction-history/internal/transaction"
 )
 
+type part struct {
+	offset, size int64
+}
+
 func main() {
 	// Set up logging to include the timestamp.
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
@@ -22,6 +28,7 @@ func main() {
 	interactivePtr := flag.Bool("interactive", false, "Enable interactive mode to input period and file path")
 	periodPtr := flag.String("period", "", "Year and Month in YYYYMM format (required if not in interactive mode)")
 	filePathPtr := flag.String("file", "", "Path to the CSV file containing transactions (required if not in interactive mode)")
+	largeworkernumPtr := flag.Int("workernum", 0, "Enable split file into chunk and process")
 
 	flag.Parse()
 
@@ -39,9 +46,34 @@ func main() {
 	}
 	defer file.Close()
 
-	summary, err := processor.ProcessData(file, yearMonth)
-	if err != nil {
-		log.Fatalf("Error processing CSV file: %v", err)
+	var summary transaction.Summary
+	chunkNum := *largeworkernumPtr
+	if chunkNum <= 0 {
+		summary, err = processor.ProcessData(file, yearMonth)
+		if err != nil {
+			log.Fatalf("Error processing CSV file: %v", err)
+		}
+	} else {
+		// Determine non-overlapping parts for file split (each part has offset and size).
+		parts, err := splitFile(filePath, chunkNum)
+		if err != nil {
+			log.Fatalf("Error spliting file")
+		}
+		// Start a goroutine to process each part, returning results on a channel.
+		resultsCh := make(chan transaction.Summary)
+		for _, part := range parts {
+			go processPart(filePath, part.offset, part.size, yearMonth, resultsCh)
+		}
+
+		for i := 0; i < len(parts); i++ {
+			result := <-resultsCh
+			summary.TotalIncome = summary.TotalIncome + result.TotalIncome
+			summary.TotalExpenditure = summary.TotalExpenditure + result.TotalExpenditure
+			summary.Transactions = append(summary.Transactions, result.Transactions...)
+		}
+
+		summary.Period = yearMonth
+		transaction.SortTransactions(summary.Transactions)
 	}
 
 	// Generate JSON output.
@@ -134,4 +166,67 @@ func interactiveInput(periodPtr, filePathPtr *string) {
 	}
 
 	return
+}
+
+// splitFile: https://github.com/benhoyt/go-1brc/blob/fafba3256ea28631f6b3739f6d3b711a91199861/r8.go#L124
+func splitFile(inputPath string, numParts int) ([]part, error) {
+	const maxLineLength = 40
+
+	f, err := os.Open(inputPath)
+	if err != nil {
+		return nil, err
+	}
+	st, err := f.Stat()
+	if err != nil {
+		return nil, err
+	}
+	size := st.Size()
+	splitSize := size / int64(numParts)
+
+	buf := make([]byte, maxLineLength)
+
+	parts := make([]part, 0, numParts)
+	offset := int64(0)
+	for offset < size {
+		seekOffset := max(offset+splitSize-maxLineLength, 0)
+		if seekOffset > size {
+			break
+		}
+		_, err := f.Seek(seekOffset, io.SeekStart)
+		if err != nil {
+			return nil, err
+		}
+		n, _ := io.ReadFull(f, buf)
+		chunk := buf[:n]
+		newline := bytes.LastIndexByte(chunk, '\n')
+		if newline < 0 {
+			return nil, fmt.Errorf("newline not found at offset %d", offset+splitSize-maxLineLength)
+		}
+		remaining := len(chunk) - newline - 1
+		nextOffset := seekOffset + int64(len(chunk)) - int64(remaining)
+		parts = append(parts, part{offset, nextOffset - offset})
+		offset = nextOffset
+	}
+	return parts, nil
+}
+
+func processPart(inputPath string, fileOffset int64, fileSize int64, yearMonth string, resultsCh chan<- transaction.Summary) {
+	file, err := os.Open(inputPath)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+	_, err = file.Seek(fileOffset, io.SeekStart)
+	if err != nil {
+		panic(err)
+	}
+	// f := io.LimitedReader{R: file, N: fileSize}
+	f := io.LimitReader(file, fileSize)
+
+	summary, err := processor.ProcessLargeData(f, yearMonth)
+	if err != nil {
+		log.Fatalf("Error processing CSV file: %v", err)
+	}
+
+	resultsCh <- summary
 }
