@@ -5,6 +5,23 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Single worker",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/cmd",
+            "envFile": "${workspaceFolder}/.vscode/.env",
+            "showLog": true,
+            "console": "integratedTerminal",
+            "args": [
+                "-period",
+                "202201",
+                "-file",
+                "./test/testdata/transactions.csv",
+            ]
+        },
+        {
             "name": "Multi workers",
             "type": "go",
             "request": "launch",
