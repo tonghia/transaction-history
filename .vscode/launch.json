@@ -18,7 +18,7 @@
                 "-period",
                 "202201",
                 "-file",
-                "./test/testdata/no_header.csv",
+                "./test/testdata/transactions.csv",
                 "-workernum",
                 "2",
             ]

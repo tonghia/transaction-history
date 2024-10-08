@@ -168,9 +168,11 @@ func interactiveInput(periodPtr, filePathPtr *string) {
 	return
 }
 
-// splitFile: https://github.com/benhoyt/go-1brc/blob/fafba3256ea28631f6b3739f6d3b711a91199861/r8.go#L124
+// splitFile splits a file into multiple parts based on the specified number of parts
+// refer to https://github.com/benhoyt/go-1brc/blob/fafba3256ea28631f6b3739f6d3b711a91199861/r8.go#L124
 func splitFile(inputPath string, numParts int) ([]part, error) {
-	const maxLineLength = 40
+	const maxLineLength = 100 // Assumption
+	const headerLength = 20
 
 	f, err := os.Open(inputPath)
 	if err != nil {
@@ -186,9 +188,9 @@ func splitFile(inputPath string, numParts int) ([]part, error) {
 	buf := make([]byte, maxLineLength)
 
 	parts := make([]part, 0, numParts)
-	offset := int64(0)
+	offset := int64(headerLength)
 	for offset < size {
-		seekOffset := max(offset+splitSize-maxLineLength, 0)
+		seekOffset := max(offset+splitSize-maxLineLength, offset)
 		if seekOffset > size {
 			break
 		}
@@ -200,7 +202,9 @@ func splitFile(inputPath string, numParts int) ([]part, error) {
 		chunk := buf[:n]
 		newline := bytes.LastIndexByte(chunk, '\n')
 		if newline < 0 {
-			return nil, fmt.Errorf("newline not found at offset %d", offset+splitSize-maxLineLength)
+			// Case 1: there is no `\n` at the end of the file, we stop
+			// Case 2: maxLineLength is too small for the line, we accept there will be a huge chunk and improve it later
+			break
 		}
 		remaining := len(chunk) - newline - 1
 		nextOffset := seekOffset + int64(len(chunk)) - int64(remaining)
