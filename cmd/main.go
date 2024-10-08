@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
@@ -21,6 +22,7 @@ func main() {
 	periodPtr := flag.String("period", "", "Year and Month in YYYYMM format (required if not in interactive mode)")
 	filePathPtr := flag.String("file", "", "Path to the CSV file containing transactions (required if not in interactive mode)")
 	workernumPtr := flag.Int("workernum", 0, "Enable split file into chunk and process")
+	outPathPtr := flag.String("out", "", "Path to the output file containing summary result in JSON format (optional)")
 
 	flag.Parse()
 
@@ -45,7 +47,13 @@ func main() {
 		log.Fatalf("Error processing CSV file: %v", err)
 	}
 
-	fmt.Println(string(summaryJSON))
+	if *outPathPtr != "" {
+		if err := generateOutputFile(summaryJSON, *outPathPtr); err != nil {
+			log.Fatalf("Error generating output file: %v", err)
+		}
+	} else {
+		fmt.Println(string(summaryJSON))
+	}
 }
 
 func interactiveInput(periodPtr, filePathPtr *string) {
@@ -86,4 +94,21 @@ func interactiveInput(periodPtr, filePathPtr *string) {
 		*filePathPtr = inputFilePath
 		break
 	}
+}
+
+func generateOutputFile(jsonData json.RawMessage, outputPath string) error {
+	// Create or truncate the output file
+	outFile, err := os.Create(outputPath)
+	if err != nil {
+		return fmt.Errorf("failed to create output file: %w", err)
+	}
+	defer outFile.Close()
+
+	// Write JSON data to the file
+	_, err = outFile.Write(jsonData)
+	if err != nil {
+		return fmt.Errorf("failed to write JSON to file: %w", err)
+	}
+
+	return nil
 }
