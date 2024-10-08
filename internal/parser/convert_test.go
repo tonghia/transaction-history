@@ -1,4 +1,4 @@
-package tconv
+package parser
 
 import (
 	"testing"

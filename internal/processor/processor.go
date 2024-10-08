@@ -12,7 +12,6 @@ import (
 
 	"github.com/tonghia/transaction-history/internal/parser"
 	"github.com/tonghia/transaction-history/internal/transaction"
-	"github.com/tonghia/transaction-history/pkg/tconv"
 )
 
 type part struct {
@@ -80,7 +79,7 @@ func Process(filePath string, yearMonth string, workerNum int) (json.RawMessage,
 
 func ProcessData(file io.Reader, yearMonth string) (transaction.Summary, error) {
 	// Parse the test period
-	year, month, err := tconv.ParseYearMonth(yearMonth)
+	year, month, err := parser.ParseYearMonth(yearMonth)
 	if err != nil {
 		return transaction.Summary{}, nil
 	}
