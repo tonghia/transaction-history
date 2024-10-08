@@ -9,9 +9,9 @@ import (
 	"io"
 	"log"
 	"os"
-	"path/filepath"
 	"strings"
 
+	"github.com/tonghia/transaction-history/internal/args"
 	"github.com/tonghia/transaction-history/internal/processor"
 	"github.com/tonghia/transaction-history/internal/transaction"
 )
@@ -38,7 +38,15 @@ func main() {
 	}
 
 	// Parse command-line arguments
-	yearMonth, filePath := parseArguments(periodPtr, filePathPtr)
+	yearMonth, err := args.ParsePeriod(*periodPtr)
+	if err != nil {
+		log.Fatalf("Invalid period: %v", err)
+	}
+
+	filePath, err := args.ParseFilePath(*filePathPtr)
+	if err != nil {
+		log.Fatalf("Invalid file path: %v", err)
+	}
 
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -78,42 +86,6 @@ func main() {
 
 	// Generate JSON output.
 	outputJSON(summary)
-}
-
-// parseArguments parses and validates command-line arguments.
-func parseArguments(yearMonthPtr, filePathPtr *string) (string, string) {
-
-	// Validate the inputs.
-	if *yearMonthPtr == "" || *filePathPtr == "" {
-		flag.Usage()
-		log.Fatal("Both -period and -file arguments are required.")
-	}
-
-	// Validate the period format.
-	// _, _, err = transaction.ParseYearMonth(inputPeriod)
-	// if err != nil {
-	// 	fmt.Printf("Invalid period: %v. Please try again.\n", err)
-	// 	continue
-	// }
-
-	// Verify that the file exists and is a regular file.
-	absPath, err := filepath.Abs(*filePathPtr)
-	if err != nil {
-		log.Fatalf("Error resolving absolute path: %v", err)
-	}
-
-	fileInfo, err := os.Stat(absPath)
-	if os.IsNotExist(err) {
-		log.Fatalf("File does not exist: %s", absPath)
-	}
-	if err != nil {
-		log.Fatalf("Error accessing file: %v", err)
-	}
-	if fileInfo.IsDir() {
-		log.Fatalf("Provided file path is a directory, not a file: %s", absPath)
-	}
-
-	return *yearMonthPtr, absPath
 }
 
 // outputJSON marshals the summary into JSON and outputs it.
