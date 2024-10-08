@@ -56,7 +56,7 @@ func main() {
 
 	var summary transaction.Summary
 	chunkNum := *largeworkernumPtr
-	if chunkNum <= 0 {
+	if chunkNum <= 1 {
 		summary, err = processor.ProcessData(file, yearMonth)
 		if err != nil {
 			log.Fatalf("Error processing CSV file: %v", err)
@@ -136,8 +136,6 @@ func interactiveInput(periodPtr, filePathPtr *string) {
 		*filePathPtr = inputFilePath
 		break
 	}
-
-	return
 }
 
 // splitFile splits a file into multiple parts based on the specified number of parts
