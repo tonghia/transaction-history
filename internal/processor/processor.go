@@ -156,11 +156,11 @@ func splitFile(inputPath string, numParts int, initOffset int) ([]part, error) {
 func processPart(inputPath string, fileOffset int64, fileSize int64, yearMonth string, resultsCh chan<- transaction.Summary) {
 	file, err := os.Open(inputPath)
 	if err != nil {
-		panic(err)
+		log.Fatalf("Error opening CSV file: %v", err)
 	}
 	defer file.Close()
 	if _, err := file.Seek(fileOffset, io.SeekStart); err != nil {
-		panic(err)
+		log.Fatalf("Error seeking to offset: %v", err)
 	}
 
 	f := io.LimitReader(file, fileSize)
