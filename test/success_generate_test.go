@@ -37,9 +37,15 @@ func TestSummaryGeneration(t *testing.T) {
 		t.Fatalf("Failed to unmarshal expected summary JSON: %v", err)
 	}
 
-	generatedSummary, err := processor.ProcessData(transactionsFile, testPeriod)
+	generatedSummaryData, err := processor.Process(transactionsFilePath, testPeriod, 1)
 	if err != nil {
 		t.Fatalf("Failed to generate summary: %v", err)
+	}
+
+	var generatedSummary transaction.Summary
+	err = json.Unmarshal(generatedSummaryData, &generatedSummary)
+	if err != nil {
+		t.Fatalf("Failed to unmarshal expected summary JSON: %v", err)
 	}
 
 	// Compare the generated summary with the expected summary
