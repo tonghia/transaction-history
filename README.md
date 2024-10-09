@@ -43,7 +43,7 @@ Standard libraries are good enough to solve the problem:
 - `sort`, `strconv`, `strings`, `time` for handling logic filtering, converting, comparing.
 - `testing` package would be use for unit test.
 
-Standard libraries are well tested with many online references. I tried to research some open source libraries to improve the performance but it require time to learn about its usage with lacking support from document or community.
+Standard libraries are well tested with many online references. I tried to research some open source libraries but it require time to learn about its usage with lacking support by document or community.
 
 ### Quality Attributes
 
@@ -72,9 +72,9 @@ The second way is running the program with flag `workernum` with an integer argu
 
 ### Challenges
 
-I have been writing personal programs before, but this is the first time I build a complete CLI application. I searched Github open source CLI project in Go to learn about its build process, how it handles flags and arguments.
+I have wrote personal programs before, but this is the first time I build a complete CLI application. I searched Github open source CLI project in Go to learn about its build process, how it handles flags and arguments.
 
-The real challenge appears when I decided to support a way to handle a really large file. After researching some solutions, they are so complicated that I cannot apply quickly. So I decided to choose only one most valued thing to apply, which is the ability to split the input file into chunks and process it parralel. I didn't micro optimized the original version, so it's simple enough for me to modify and extend for parallel processing.
+The real challenge appeared when I decided to support processing a really large file. After researching some solutions, they are so complicated that I cannot apply quickly. So I decided to choose the most valued thing to apply, which is the ability to split the input file into chunks and process it parralel. I didn't micro optimized the original version, so it's simple enough for me to modify and extend for parallel processing.
 
 ## Future Work
 
@@ -84,6 +84,10 @@ I do see there are lots of things can be optimized to improve the performance:
 - Reduce using Go `time.Parse` and use integer comparison since we already know about the date format pattern.
 - While increasing the transactions slice, we can build a sorted slice instead of sorting it after filtering all transactions.
 - With a large input file, can use slice of pointer (data store in heap by default) instead of slice of value (let Go decide data stay in stack or heap). Then applying merge sort while merging all chunk result.
+
+In my opinion, before doing any optimization, I need to benchmark functions and profiling the program. Go has support with the package `runtime/pprof`.
+
+The program provide a flag to enable processing file in chunks but I have not tested much with a real large file.
 
 ## Diagram
 
