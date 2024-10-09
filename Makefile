@@ -51,7 +51,7 @@ format:
 # Run tests (assuming you have tests)
 test:
 	@echo "🧪 Running tests..."
-	$(GO) test -cover $(shell go list ./... | grep -v /cmd ) -v
+	$(GO) test -cover $(shell go list ./... | grep -Fv -e /cmd -e /script ) -v
 
 # Lint the code (requires golint to be installed)
 lint:
