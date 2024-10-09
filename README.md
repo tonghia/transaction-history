@@ -72,7 +72,7 @@ The second way is running the program with flag `workernum` with an integer argu
 
 ### Challenges
 
-I have been writing personal program before, but this is the first time I build a complete CLI application. I searched Github open source CLI project in Go to learn about its build process, how it handles flags and arguments.
+I have been writing personal programs before, but this is the first time I build a complete CLI application. I searched Github open source CLI project in Go to learn about its build process, how it handles flags and arguments.
 
 The real challenge appears when I decided to support a way to handle a really large file. After researching some solutions, they are so complicated that I cannot apply quickly. So I decided to choose only one most valued thing to apply, which is the ability to split the input file into chunks and process it parralel. I didn't micro optimized the original version, so it's simple enough for me to modify and extend for parallel processing.
 
@@ -82,7 +82,7 @@ I do see there are lots of things can be optimized to improve the performance:
 
 - Filtering the transaction while converting it from csv records.
 - Reduce using Go `time.Parse` and use integer comparison since we already know about the date format pattern.
-- While increasing the transactions slide, we can build a sorted slice instead of sorting it after filtering all transactions.
+- While increasing the transactions slice, we can build a sorted slice instead of sorting it after filtering all transactions.
 - With a large input file, can use slice of pointer (data store in heap by default) instead of slice of value (let Go decide data stay in stack or heap). Then applying merge sort while merging all chunk result.
 
 ## Diagram
