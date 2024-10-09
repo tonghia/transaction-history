@@ -6,7 +6,7 @@
 - Initial understanding:
   - The program is for personal use.
   - The main task of this program is process data to get some kind of knowledge.
-- Beakdown the assignment:
+- Breakdown the assignment into smaller tasks:
   - Create a command line application which take 2 arguments: the "period" and a path to a file.
   - Read the file content and convert into our program data structure.
   - Main task: process the data to get the result.
@@ -22,10 +22,11 @@
   1. Convert the data in csv file into a list of the program data structure.
   2. Filter the list by the period argument.
   3. Calculate total expense and income, and sort the filtered list.
-- The first version is easy to test and understand but it also waste lots of memory by transfer data between each step, the default sort function is not efficient too. It cannot work with a large dataset.
+- The first version is easy to test and understand but it also wastes lots of memory by transfer data between each step, the default sort function is not efficient too. It cannot work with a large dataset.
 - In the second version, I intend to improve 2 things:
   - While reading the data, filter by period argument. When building the filtered list, apply insertion sort.
   - Divide the original file into chunks and process each chunk in parallel. Finally, calculate the total and apply merge sort for each chunk transaction list.
+- The second version may cost me more time than the given deadline. So, I modify it, keep the most valued part which is ability to split the csv file into chunks and process each chunk parallely. I added a flag to enable this feature, while keep all the logic of the original program.
 
 ## Design Decisions
 
@@ -35,7 +36,7 @@ This assignment request creating a personal program which will evaluate programm
 
 ### Libraries and Frameworks
 
-In the first version of the program, I go with standard libraries:
+Standard libraries are good enough to solve the problem:
 
 - `os`, `flag` for commandline interface.
 - `encoding/csv`, `encoding/json`, `path/filepath` for handling input and output files.
@@ -46,14 +47,74 @@ In the first version of the program, I go with standard libraries:
 
 There are some attributes which can be suitable for this program:
 
-- Performance: by complete the task fast and can handle a large dataset.
-- Testability: ability to easily write test with high coverage.
-- Modifiability: ability to change the format of input, ouput of the program.
+- Performance: by complete the task efficiently and can handle a large dataset.
+- Testability: ability to write test easily with high coverage.
+- Modifiability: ability to change the format of input, ouput or extend the program.
 - Usability: by providing command, flags, or argument to support multiple features.
 
-In the first version, I would choose: Modifiability, Testability.
-In the second version, I would choose: Performance and Modifiability.
+Actually, there are 2 ways to execute the program, differentiate by the flag `-workernum`.
+
+The normal way (run without flag `workernum`), will run the program in single execution path (the program main thread) sequentially. It has 3 attributes: testability, modifiability, and usability.
+
+The second way is running the program with flag `workernum` with an integer argument greater than 1. The program will split the input into chunks and process each chunk concurrently with native goroutine and channel. The implementation of concurency model in Go will automatically enable parallel behind the scene. This way my program will replace **testability** attribute with **performance** attribute.
 
 ## Requirement Fullfilment
 
 ## Future Work
+
+## Diagram
+
+```mermaid
+flowchart TD
+    %% Start of the program
+    A[Start] --> B[Parse Command-Line Flags]
+    
+    %% Decision: Interactive Mode?
+    B --> C{Is Interactive Mode?}
+    
+    %% Interactive Mode Flow
+    C -- Yes --> D[Prompt User for Period YYYYMM]
+    D --> E[Prompt User for CSV File Path]
+    E --> H[Validate Inputs]
+    
+    %% Non-Interactive Mode Flow
+    C -- No --> H[Validate -period and -file Flags]
+    
+    %% New Decision: Check -workernum Flag
+    H --> Q{Is workernum > 1?}
+    
+    %% If -workernum > 1, Split File into Chunks
+    Q -- Yes --> G[Split CSV File into Chunks]
+    G --> I[Launch Goroutines to Process Chunks]
+    
+    %% If -workernum <= 1, Process Transactions
+    Q -- No --> S[Process Transactions]
+    
+    %% Concurrent Processing
+    I --> J[Each Goroutine: Open CSV File Seek to Offset Read Chunk]
+    J --> S
+    
+    %% Aggregation of Results
+    X --> K[Main Goroutine: Collect Partial Summaries Aggregate Totals and Transactions] --> U
+    
+    
+    %% Output Decision
+    U --> M{Is output Flag set?}
+    
+    %% Output to File
+    M -- Yes --> N[Write JSON Summary to Specified Output File]
+    N --> O[End]
+    
+    %% Output to stdout
+    M -- No --> P[Print JSON Summary to stdout]
+    P --> O
+    
+    %% Process Transactions
+    subgraph Process Transactions
+        S[Convert CSV data to Transactions] --> T[Filter Transactions by Period]
+        T --> V[Calculate Summary]
+        V --> X[Sort Transactions by Date Descending]
+    end
+
+    X --> U[Convert to JSON string]
+```
