@@ -62,9 +62,9 @@ lint:
 # Builds binaries for Linux, Windows, and macOS
 cross-compile:
 	@echo "🌐 Cross-compiling for different platforms..."
-	$(GO) build -o $(BUILD_DIR)/$(BINARY_NAME)-linux-amd64 -ldflags="$(LDFLAGS)" GOOS=linux GOARCH=amd64 $(MAIN)
-	$(GO) build -o $(BUILD_DIR)/$(BINARY_NAME)-windows-amd64.exe -ldflags="$(LDFLAGS)" GOOS=windows GOARCH=amd64 $(MAIN)
-	$(GO) build -o $(BUILD_DIR)/$(BINARY_NAME)-darwin-amd64 -ldflags="$(LDFLAGS)" GOOS=darwin GOARCH=amd64 $(MAIN)
+	env GOOS=linux GOARCH=amd64 $(GO) build -o $(BUILD_DIR)/$(BINARY_NAME)-linux-amd64 -ldflags="$(LDFLAGS)" $(MAIN)
+	env GOOS=windows GOARCH=amd64 $(GO) build -o $(BUILD_DIR)/$(BINARY_NAME)-windows-amd64.exe -ldflags="$(LDFLAGS)" $(MAIN)
+	env GOOS=darwin GOARCH=amd64 $(GO) build -o $(BUILD_DIR)/$(BINARY_NAME)-darwin-amd64 -ldflags="$(LDFLAGS)" $(MAIN)
 	@echo "✅ Cross-compilation completed."
 
 
