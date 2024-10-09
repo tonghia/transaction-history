@@ -43,6 +43,8 @@ Standard libraries are good enough to solve the problem:
 - `sort`, `strconv`, `strings`, `time` for handling logic filtering, converting, comparing.
 - `testing` package would be use for unit test.
 
+Standard libraries are well tested with many online references. I tried to research some open source libraries to improve the performance but it require time to learn about its usage with lacking support from document or community.
+
 ### Quality Attributes
 
 There are some attributes which can be suitable for this program:
@@ -60,7 +62,28 @@ The second way is running the program with flag `workernum` with an integer argu
 
 ## Requirement Fullfilment
 
+### Completed Requirement Checklist
+
+- [x] Create a CLI application which take 2 inputs: Year and Month (YYYYMM Format) and a path to the file that records the history of wallet deposits and withdrawals.
+- [x] Read the file content and process the data to get the result.
+- [x] Show the result in standard output with ability to export to file.
+- [x] Have a build system using Github Action.
+- [x] Have document for the application.
+
+### Challenges
+
+I have been writing personal program before, but this is the first time I build a complete CLI application. I searched Github open source CLI project in Go to learn about its build process, how it handles flags and arguments.
+
+The real challenge appears when I decided to support a way to handle a really large file. After researching some solutions, they are so complicated that I cannot apply quickly. So I decided to choose only one most valued thing to apply, which is the ability to split the input file into chunks and process it parralel. I didn't micro optimized the original version, so it's simple enough for me to modify and extend for parallel processing.
+
 ## Future Work
+
+I do see there are lots of things can be optimized to improve the performance:
+
+- Filtering the transaction while converting it from csv records.
+- Reduce using Go `time.Parse` and use integer comparison since we already know about the date format pattern.
+- While increasing the transactions slide, we can build a sorted slice instead of sorting it after filtering all transactions.
+- With a large input file, can use slice of pointer (data store in heap by default) instead of slice of value (let Go decide data stay in stack or heap). Then applying merge sort while merging all chunk result.
 
 ## Diagram
 
