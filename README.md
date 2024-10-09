@@ -27,6 +27,7 @@
   - While reading the data, filter by period argument. When building the filtered list, apply insertion sort.
   - Divide the original file into chunks and process each chunk in parallel. Finally, calculate the total and apply merge sort for each chunk transaction list.
 - The second version may cost me more time than the given deadline. So, I modify it, keep the most valued part which is ability to split the csv file into chunks and process each chunk parallely. I added a flag to enable this feature, while keep all the logic of the original program.
+- Review: whenever I do programming out of working hour, I always see it a chance for innovation and practicing. I completed the assignment like doing the real program for myself. The way I complete the program similar to how I solve problems: begin with planning, buffer time for reviewing, first make the program works, then make it right, finally make it efficient.
 
 ## Design Decisions
 
@@ -56,7 +57,7 @@ There are some attributes which can be suitable for this program:
 
 Actually, there are 2 ways to execute the program, differentiate by the flag `-workernum`.
 
-The normal way (run without flag `workernum`), will run the program in single execution path (the program main thread) sequentially. It has 3 attributes: testability, modifiability, and usability.
+The normal way (run without flag `workernum`), will run the program in single execution path (the program main goroutine) sequentially. It has 3 attributes: testability, modifiability, and usability.
 
 The second way is running the program with flag `workernum` with an integer argument greater than 1. The program will split the input into chunks and process each chunk concurrently with native goroutine and channel. The implementation of concurency model in Go will automatically enable parallel behind the scene. This way my program will replace **testability** attribute with **performance** attribute.
 
@@ -72,7 +73,7 @@ The second way is running the program with flag `workernum` with an integer argu
 
 ### Challenges
 
-I have wrote personal programs before, but this is the first time I build a complete CLI application. I searched Github open source CLI project in Go to learn about its build process, how it handles flags and arguments.
+I have written personal programs before, but this is the first time I build a complete CLI application. I searched Github open source CLI project in Go to learn about its build process, how it handles flags and arguments.
 
 The real challenge appeared when I decided to support processing a really large file. After researching some solutions, they are so complicated that I cannot apply quickly. So I decided to choose the most valued thing to apply, which is the ability to split the input file into chunks and process it parralel. I didn't micro optimized the original version, so it's simple enough for me to modify and extend for parallel processing.
 
